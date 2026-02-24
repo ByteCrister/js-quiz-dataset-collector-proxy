@@ -1,16 +1,18 @@
 // api/submit.js
+import fetch from "node-fetch";
+
 export default async function handler(req, res) {
-  // Allow CORS for your GitHub Pages domain
+  // CORS headers
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") {
-    return res.status(200).end();
+    return res.status(200).end(); // preflight
   }
 
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+    return res.status(405).json({ status: "error", message: "Method not allowed" });
   }
 
   try {
@@ -39,9 +41,6 @@ export default async function handler(req, res) {
     return res.status(200).json(result);
   } catch (err) {
     console.error(err);
-    return res.status(500).json({
-      status: "error",
-      message: err.toString(),
-    });
+    return res.status(500).json({ status: "error", message: err.toString() });
   }
 }
