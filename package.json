@@ -5,5 +5,7 @@
   "scripts": {
     "build": "echo 'No build step needed'"
   },
-  "dependencies": {}
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
 }
