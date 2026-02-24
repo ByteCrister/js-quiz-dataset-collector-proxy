@@ -1,31 +1,47 @@
 // api/submit.js
-import fetch from "node-fetch";
-
 export default async function handler(req, res) {
+  // Allow CORS for your GitHub Pages domain
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    const payload = req.body; // JSON from your GitHub Pages site
+    const payload = req.body;
 
-    // Call your Google Apps Script URL (exec) as you
-    const appsScriptURL = "https://script.google.com/macros/s/AKfycbwjqrXiY-K9V9A8H5HI_aoDYbN4GVF41gtn7x09rRK1VPxsnqR9qZi6QHxPDeC9nuRQKw/exec";
+    const appsScriptURL =
+      "https://script.google.com/macros/s/AKfycbwjqrXiY-K9V9A8H5HI_aoDYbN4GVF41gtn7x09rRK1VPxsnqR9qZi6QHxPDeC9nuRQKw/exec";
 
     const response = await fetch(appsScriptURL, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
 
-    const result = await response.json();
+    const text = await response.text();
 
-    // Return response to the browser
-    res.status(200).json(result);
+    let result;
+    try {
+      result = JSON.parse(text);
+    } catch {
+      result = { status: "error", message: "Invalid JSON from Apps Script", raw: text };
+    }
+
+    return res.status(200).json(result);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ status: "error", message: err.toString() });
+    return res.status(500).json({
+      status: "error",
+      message: err.toString(),
+    });
   }
 }
