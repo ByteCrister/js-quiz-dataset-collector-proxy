@@ -1,7 +1,8 @@
 // api/submit.js
-import fetch from "node-fetch";
 
 export default async function handler(req, res) {
+  // Dynamic import for ESM module
+  const fetch = (await import("node-fetch")).default;
   // CORS headers
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
